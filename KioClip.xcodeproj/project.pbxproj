@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		63872CA02EACB21A0055BB77 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 63872C9F2EACB21A0055BB77 /* RxCocoa */; };
+		63872CA22EACB21A0055BB77 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 63872CA12EACB21A0055BB77 /* RxSwift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		6321AF522E94E9A5007B8274 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -65,6 +70,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				63872CA22EACB21A0055BB77 /* RxSwift in Frameworks */,
+				63872CA02EACB21A0055BB77 /* RxCocoa in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,6 +132,8 @@
 			);
 			name = KioClip;
 			packageProductDependencies = (
+				63872C9F2EACB21A0055BB77 /* RxCocoa */,
+				63872CA12EACB21A0055BB77 /* RxSwift */,
 			);
 			productName = KioClip;
 			productReference = 6321AF3B2E94E9A3007B8274 /* KioClip.app */;
@@ -208,6 +217,9 @@
 			);
 			mainGroup = 6321AF322E94E9A3007B8274;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				63872C9E2EACB21A0055BB77 /* XCRemoteSwiftPackageReference "RxSwift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6321AF3C2E94E9A3007B8274 /* Products */;
 			projectDirPath = "";
@@ -579,6 +591,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		63872C9E2EACB21A0055BB77 /* XCRemoteSwiftPackageReference "RxSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ReactiveX/RxSwift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.9.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		63872C9F2EACB21A0055BB77 /* RxCocoa */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 63872C9E2EACB21A0055BB77 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxCocoa;
+		};
+		63872CA12EACB21A0055BB77 /* RxSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 63872C9E2EACB21A0055BB77 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 6321AF332E94E9A3007B8274 /* Project object */;
 }
