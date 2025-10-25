@@ -115,12 +115,8 @@ extension ArticleGroupViewController: UICollectionViewDelegateFlowLayout {
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if indexPath.item == groups.count {
-            print("AddGroupCell")
-        } else {
-            let selectedGroup = groups[indexPath.item]
-            let groupArticleListVC = ArticleListViewController(title: selectedGroup)
-            navigationController?.pushViewController(groupArticleListVC, animated: true)
-        }
+        let selectedGroup = groups[indexPath.item]
+        let groupArticleListVC = ArticleListViewController(title: selectedGroup)
+        navigationController?.pushViewController(groupArticleListVC, animated: true)
     }
 }
