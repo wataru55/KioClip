@@ -23,9 +23,9 @@ enum TextFieldType {
     var keyboardtype: UIKeyboardType {
         switch self {
         case .group:
-            return .emailAddress
-        case .article:
             return .default
+        case .article:
+            return .URL
         }
     }
 }
