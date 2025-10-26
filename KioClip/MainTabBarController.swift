@@ -43,7 +43,7 @@ class MainTabBarController: UITabBarController {
         let groups = ["Swift", "React", "データベース", "アルゴリズム", "UI/UX", "機械学習"]
         var allArticles: [Article] = []
 
-        for (groupIndex, group) in groups.enumerated() {
+        for (_, group) in groups.enumerated() {
             let mockTitles = [
                 "\(group)の基礎知識",
                 "\(group)でよくあるエラーと解決方法",
@@ -52,14 +52,10 @@ class MainTabBarController: UITabBarController {
                 "\(group)を使った実装例",
             ]
 
-            for (articleIndex, title) in mockTitles.enumerated() {
+            for (articleIndex, _) in mockTitles.enumerated() {
                 let article = Article(
-                    id: UUID().uuidString,
-                    title: title,
                     url: "https://example.com/\(group.lowercased())/article\(articleIndex + 1)",
                     groupName: group,
-                    savedDate: Date().addingTimeInterval(-Double(articleIndex * 86400)),
-                    nextReviewDate: Date().addingTimeInterval(Double(articleIndex * 86400 * 3))
                 )
                 allArticles.append(article)
             }

@@ -5,6 +5,7 @@
 //  Created by 高橋和 on 2025/10/11.
 //
 
+import SwiftData
 import UIKit
 
 enum ModalViewControllerType {
@@ -35,6 +36,16 @@ class ModalViewController: UIViewController {
     let type: ModalViewControllerType
     weak var delegate: HalfModalViewControllerDelegate?
 
+    private lazy var inputTextField: InputTextField = {
+        let inputTextField = InputTextField(type: type.textFieldType)
+        inputTextField.translatesAutoresizingMaskIntoConstraints = false
+        return inputTextField
+    }()
+
+    private lazy var context: ModelContext = {
+        return PersistenceController.shared.mainContext
+    }()
+
     init(type: ModalViewControllerType) {
         self.type = type
         super.init(nibName: nil, bundle: nil)
@@ -49,7 +60,6 @@ class ModalViewController: UIViewController {
         setupNavigationBar()
         setupInputTextField()
 
-        // 背景色を設定（表示されたことが分かりやすいように）
         view.backgroundColor = .systemGray6
     }
 
@@ -83,8 +93,6 @@ class ModalViewController: UIViewController {
     }
 
     private func setupInputTextField() {
-        let inputTextField = InputTextField(type: type.textFieldType)
-        inputTextField.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(inputTextField)
 
         NSLayoutConstraint.activate([
@@ -106,6 +114,20 @@ class ModalViewController: UIViewController {
     @objc private func addButtonTapped() {
         print("追加ボタンがタップされた！")
         // ここに追加ボタンの処理を書く
+
+        guard let urlString = inputTextField.text, !urlString.isEmpty else {
+            return
+        }
+
+        let article = Article(url: urlString)
+        context.insert(article)
+        do {
+            try context.save()
+            self.inputTextField.text = nil
+            print("Article saved successfully")
+        } catch {
+            print("Error saving article: \(error)")
+        }
     }
 
 }

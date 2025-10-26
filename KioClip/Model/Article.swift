@@ -6,12 +6,19 @@
 //
 
 import UIKit
+import SwiftData
 
-struct Article {
-    let id: String
-    let title: String
-    let url: String
-    let groupName: String
-    let savedDate: Date
-    let nextReviewDate: Date
+@Model
+final class Article {
+    public private(set) var id: String
+    public private(set) var createdAt: Date
+    public private(set) var url: String
+    var groupName: String?
+    
+    init(url: String, groupName: String? = nil) {
+        self.id = UUID().uuidString
+        self.createdAt = Date()
+        self.url = url
+        self.groupName = groupName
+    }
 }
