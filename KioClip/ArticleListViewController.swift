@@ -1,3 +1,4 @@
+import SwiftData
 import UIKit
 
 class ArticleListViewController: UIViewController {
@@ -8,6 +9,10 @@ class ArticleListViewController: UIViewController {
         tableView.register(
             ArticleTableViewCell.self, forCellReuseIdentifier: "ArticleTableViewCell")
         return tableView
+    }()
+
+    private lazy var context: ModelContext = {
+        return PersistenceController.shared.mainContext
     }()
 
     private let addButton = AddButton()
@@ -36,6 +41,25 @@ class ArticleListViewController: UIViewController {
         setupSearchController()
         setupUI()
         setupDataSource()
+        fetchArticles()
+    }
+
+    private func fetchArticles() {
+        // FetchDescriptor(取得したいデータの注文書のようなもの)を作成
+        // savedDateの降順（新しい順）でソート
+        let descriptor = FetchDescriptor<Article>(
+            sortBy: [SortDescriptor(\.createdAt, order: .reverse)]
+        )
+
+        do {
+            // Contextにリクエストを投げて、データを取得
+            let fetchedArticles = try context.fetch(descriptor)
+            self.articles = fetchedArticles
+            print("✅ \(self.articles.count)件の記事を取得しました。")
+            tableView.reloadData()
+        } catch {
+            print("❌ 記事の取得に失敗しました: \(error)")
+        }
     }
 
     private func setupSearchController() {
