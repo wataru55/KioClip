@@ -42,7 +42,9 @@ class ModalViewController: UIViewController {
         return inputTextField
     }()
 
-    private var context: ModelContext!
+    private lazy var context: ModelContext = {
+        return PersistenceController.shared.mainContext
+    }()
 
     init(type: ModalViewControllerType) {
         self.type = type
@@ -58,7 +60,6 @@ class ModalViewController: UIViewController {
         setupNavigationBar()
         setupInputTextField()
 
-        context = PersistenceController.shared.mainContext
         view.backgroundColor = .systemGray6
     }
 
