@@ -1,21 +1,14 @@
+import SwiftData
 import UIKit
 
 class ArticleListViewController: UIViewController {
-
-    private lazy var tableView: UITableView = {
-        let tableView = UITableView()
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.register(
-            ArticleTableViewCell.self, forCellReuseIdentifier: "ArticleTableViewCell")
-        return tableView
-    }()
-
-    private let addButton = AddButton()
-
     private let listTitle: String
     private var articles: [Article] = []
-
     private let searchController = UISearchController(searchResultsController: nil)
+    
+    private let articleListView = ArticleListView()
+    private let dataService = ArticleDataService()
+    private let dataSource = ArticleListDataSource()
 
     // 統合された初期化
     init(title: String, articles: [Article] = []) {
@@ -27,15 +20,25 @@ class ArticleListViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    override func loadView() {
+        self.view = articleListView
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        addButton.addTarget(self, action: #selector(addButtonTapped), for: .touchUpInside)
+        articleListView.addButton.addTarget(self, action: #selector(addButtonTapped), for: .touchUpInside)
         title = listTitle
 
         setupSearchController()
-        setupUI()
         setupDataSource()
+        fetchArticles()
+    }
+
+    private func fetchArticles() {
+        self.articles = dataService.fetchArticles()
+        self.dataSource.articles = self.articles
+        self.articleListView.tableView.reloadData()
     }
 
     private func setupSearchController() {
@@ -47,29 +50,9 @@ class ArticleListViewController: UIViewController {
         navigationItem.hidesSearchBarWhenScrolling = false
     }
 
-    private func setupUI() {
-        view.backgroundColor = .systemBackground
-        view.addSubview(tableView)
-        view.addSubview(addButton)
-
-        NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-
-            addButton.trailingAnchor.constraint(
-                lessThanOrEqualTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
-            addButton.bottomAnchor.constraint(
-                lessThanOrEqualTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
-            addButton.widthAnchor.constraint(equalToConstant: 50),
-            addButton.heightAnchor.constraint(equalToConstant: 50),
-        ])
-    }
-
     private func setupDataSource() {
-        tableView.dataSource = self
-        tableView.delegate = self
+        articleListView.tableView.dataSource = self.dataSource
+        articleListView.tableView.delegate = self
     }
 
     @objc private func addButtonTapped() {
@@ -92,26 +75,11 @@ class ArticleListViewController: UIViewController {
     }
 }
 
-// MARK: - UITableViewDataSource
-extension ArticleListViewController: UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return articles.count
-    }
-
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell =
-            tableView.dequeueReusableCell(withIdentifier: "ArticleTableViewCell", for: indexPath)
-            as! ArticleTableViewCell
-        cell.configure(with: articles[indexPath.row])
-        return cell
-    }
-}
-
 // MARK: - UITableViewDelegate
 // Cellがタップされたときの処理を加えるための拡張
 extension ArticleListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
+        articleListView.tableView.deselectRow(at: indexPath, animated: true)
 
         let article = articles[indexPath.row]
         if let url = URL(string: article.url) {
