@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		63872CA02EACB21A0055BB77 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 63872C9F2EACB21A0055BB77 /* RxCocoa */; };
 		63872CA22EACB21A0055BB77 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 63872CA12EACB21A0055BB77 /* RxSwift */; };
+		63872D072EAF08A40055BB77 /* OpenGraph in Frameworks */ = {isa = PBXBuildFile; productRef = 63872D062EAF08A40055BB77 /* OpenGraph */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,6 +73,7 @@
 			files = (
 				63872CA22EACB21A0055BB77 /* RxSwift in Frameworks */,
 				63872CA02EACB21A0055BB77 /* RxCocoa in Frameworks */,
+				63872D072EAF08A40055BB77 /* OpenGraph in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -134,6 +136,7 @@
 			packageProductDependencies = (
 				63872C9F2EACB21A0055BB77 /* RxCocoa */,
 				63872CA12EACB21A0055BB77 /* RxSwift */,
+				63872D062EAF08A40055BB77 /* OpenGraph */,
 			);
 			productName = KioClip;
 			productReference = 6321AF3B2E94E9A3007B8274 /* KioClip.app */;
@@ -219,6 +222,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				63872C9E2EACB21A0055BB77 /* XCRemoteSwiftPackageReference "RxSwift" */,
+				63872D052EAF08A40055BB77 /* XCRemoteSwiftPackageReference "OpenGraph" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6321AF3C2E94E9A3007B8274 /* Products */;
@@ -601,6 +605,14 @@
 				minimumVersion = 6.9.1;
 			};
 		};
+		63872D052EAF08A40055BB77 /* XCRemoteSwiftPackageReference "OpenGraph" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/satoshi-takano/OpenGraph.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.6.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -613,6 +625,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 63872C9E2EACB21A0055BB77 /* XCRemoteSwiftPackageReference "RxSwift" */;
 			productName = RxSwift;
+		};
+		63872D062EAF08A40055BB77 /* OpenGraph */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 63872D052EAF08A40055BB77 /* XCRemoteSwiftPackageReference "OpenGraph" */;
+			productName = OpenGraph;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
