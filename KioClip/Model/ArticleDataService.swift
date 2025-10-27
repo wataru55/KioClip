@@ -18,7 +18,7 @@ final class ArticleDataService {
     
     func fetchArticles() -> [Article] {
         // FetchDescriptor(取得したいデータの注文書のようなもの)を作成
-        // savedDateの降順（新しい順）でソート
+        // createdAtの降順（新しい順）でソート
         let descriptor = FetchDescriptor<Article>(
             sortBy: [SortDescriptor(\.createdAt, order: .reverse)]
         )
