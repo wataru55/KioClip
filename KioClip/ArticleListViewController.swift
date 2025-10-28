@@ -9,7 +9,7 @@ class ArticleListViewController: UIViewController {
     private let articleListView = ArticleListView()
     private let dataService = ArticleDataService()
     private let dataSource = ArticleListDataSource()
-
+    
     // 統合された初期化
     init(title: String, articles: [Article] = []) {
         self.listTitle = title
@@ -33,12 +33,27 @@ class ArticleListViewController: UIViewController {
         setupSearchController()
         setupDataSource()
         fetchArticles()
+        
+        Task {
+            await syncAllOGPs()
+        }
     }
 
     private func fetchArticles() {
         self.articles = dataService.fetchArticles()
         self.dataSource.articles = self.articles
         self.articleListView.tableView.reloadData()
+    }
+    
+    private func syncAllOGPs() async {
+        // OGPがない記事だけを対象にする
+        let articlesToFetch = self.articles.filter { $0.ogp == nil }
+        
+        for article in articlesToFetch {
+            // 1件ずつ順番に取得・保存
+            await dataService.fetchAndCacheOGP(articleID: article.id)
+            self.fetchArticles()
+        }
     }
 
     private func setupSearchController() {

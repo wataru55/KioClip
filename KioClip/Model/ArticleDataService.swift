@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftData
+import OpenGraph
 
 @MainActor
 final class ArticleDataService {
@@ -31,6 +32,38 @@ final class ArticleDataService {
         } catch {
             print("❌ 記事の取得に失敗しました: \(error)")
             return []
+        }
+    }
+    
+    func fetchAndCacheOGP(articleID: String) async {
+        let descriptor = FetchDescriptor<Article>(
+            predicate: #Predicate<Article> { $0.id == articleID }
+        )
+        guard let article = try? context.fetch(descriptor).first else {
+            return
+        }
+        
+        // 2. すでにOGPがあるなら何もしない（キャッシュ利用）
+        if article.ogp != nil {
+            print("すでに存在しているよ")
+            return
+        }
+        
+        do {
+            let og = try await OpenGraph.fetch(url: URL(string: article.url)!)
+            let fetchedOGP = OpenGraphData(
+                title: og[.title],
+                imageURLString: og[.image]
+            )
+            
+            context.insert(fetchedOGP)
+            article.ogp = fetchedOGP
+            fetchedOGP.article = article
+            
+            try context.save()
+            
+        } catch {
+            print("❌ OGPの保存に失敗: \(error)")
         }
     }
 }
