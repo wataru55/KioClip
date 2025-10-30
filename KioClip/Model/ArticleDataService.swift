@@ -49,8 +49,13 @@ final class ArticleDataService {
             return
         }
         
+        guard let url = URL(string: article.url) else {
+            print("❌ 無効なURL: \(article.url)")
+            return
+        }
+        
         do {
-            let og = try await OpenGraph.fetch(url: URL(string: article.url)!)
+            let og = try await OpenGraph.fetch(url: url)
             let fetchedOGP = OpenGraphData(
                 title: og[.title],
                 imageURLString: og[.image]
