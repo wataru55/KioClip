@@ -5,11 +5,11 @@ class ArticleListViewController: UIViewController {
     private let listTitle: String
     private var articles: [Article] = []
     private let searchController = UISearchController(searchResultsController: nil)
-    
+
     private let articleListView = ArticleListView()
     private let dataService = ArticleDataService()
     private let dataSource = ArticleListDataSource()
-    
+
     // 統合された初期化
     init(title: String, articles: [Article] = []) {
         self.listTitle = title
@@ -20,20 +20,21 @@ class ArticleListViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func loadView() {
         self.view = articleListView
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        articleListView.addButton.addTarget(self, action: #selector(addButtonTapped), for: .touchUpInside)
+        articleListView.addButton.addTarget(
+            self, action: #selector(addButtonTapped), for: .touchUpInside)
         title = listTitle
 
         setupSearchController()
         setupDataSource()
         fetchArticles()
-        
+
         Task {
             await syncAllOGPs()
         }
@@ -44,16 +45,17 @@ class ArticleListViewController: UIViewController {
         self.dataSource.articles = self.articles
         self.articleListView.tableView.reloadData()
     }
-    
+
     private func syncAllOGPs() async {
         // OGPがない記事だけを対象にする
         let articlesToFetch = self.articles.filter { $0.ogp == nil }
-        
+
         for article in articlesToFetch {
             // 1件ずつ順番に取得・保存
             await dataService.fetchAndCacheOGP(articleID: article.id)
-            self.fetchArticles()
         }
+
+        self.fetchArticles()
     }
 
     private func setupSearchController() {
