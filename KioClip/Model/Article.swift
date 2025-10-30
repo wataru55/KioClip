@@ -15,6 +15,9 @@ final class Article {
     public private(set) var url: String
     var groupName: String?
     
+    @Relationship(deleteRule: .cascade)
+    var ogp: OpenGraphData?
+    
     init(url: String, groupName: String? = nil) {
         self.id = UUID().uuidString
         self.createdAt = Date()
