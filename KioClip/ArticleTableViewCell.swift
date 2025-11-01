@@ -80,7 +80,6 @@ class ArticleTableViewCell: UITableViewCell {
         contentView.addSubview(textStackView)
 
         NSLayoutConstraint.activate([
-            ogpImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             ogpImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
             ogpImageView.widthAnchor.constraint(equalToConstant: 120),
             ogpImageView.heightAnchor.constraint(equalToConstant: 80),
