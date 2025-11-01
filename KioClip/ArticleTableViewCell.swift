@@ -1,6 +1,23 @@
+import Kingfisher
 import UIKit
 
 class ArticleTableViewCell: UITableViewCell {
+
+    private static let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.timeStyle = .none
+        return formatter
+    }()
+
+    private let ogpImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFill  // 画像の表示モード
+        imageView.clipsToBounds = true  // 角丸などのため
+        imageView.layer.cornerRadius = 4
+        return imageView
+    }()
 
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -10,7 +27,7 @@ class ArticleTableViewCell: UITableViewCell {
         return label
     }()
 
-    private let urlLabel: UILabel = {
+    private let urlHostLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = .systemFont(ofSize: 12, weight: .regular)
@@ -23,8 +40,24 @@ class ArticleTableViewCell: UITableViewCell {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = .systemFont(ofSize: 12, weight: .regular)
-        label.textColor = .tertiaryLabel
+        label.textColor = .secondaryLabel
         return label
+    }()
+
+    private let bottomRowStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = .horizontal
+        stackView.spacing = 8
+        return stackView
+    }()
+
+    private let textStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = .vertical
+        stackView.spacing = 4
+        return stackView
     }()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -37,33 +70,51 @@ class ArticleTableViewCell: UITableViewCell {
     }
 
     private func setupUI() {
-        contentView.addSubview(titleLabel)
-        contentView.addSubview(urlLabel)
-        contentView.addSubview(dateLabel)
+        bottomRowStackView.addArrangedSubview(urlHostLabel)
+        bottomRowStackView.addArrangedSubview(dateLabel)
+
+        textStackView.addArrangedSubview(titleLabel)
+        textStackView.addArrangedSubview(bottomRowStackView)
+
+        contentView.addSubview(ogpImageView)
+        contentView.addSubview(textStackView)
 
         NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
-            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            titleLabel.trailingAnchor.constraint(
-                equalTo: contentView.trailingAnchor, constant: -16),
+            ogpImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
+            ogpImageView.widthAnchor.constraint(equalToConstant: 140),
+            ogpImageView.heightAnchor.constraint(equalToConstant: 80),
+            ogpImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
+            ogpImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4),
 
-            urlLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
-            urlLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            urlLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            textStackView.leadingAnchor.constraint(
+                equalTo: ogpImageView.trailingAnchor, constant: 8),
+            textStackView.trailingAnchor.constraint(
+                equalTo: contentView.trailingAnchor, constant: -8),
+            textStackView.topAnchor.constraint(equalTo: ogpImageView.topAnchor, constant: 4),
+            textStackView.bottomAnchor.constraint(equalTo: ogpImageView.bottomAnchor, constant: -4),
 
-            dateLabel.topAnchor.constraint(equalTo: urlLabel.bottomAnchor, constant: 4),
-            dateLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            dateLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
         ])
     }
 
     func configure(with article: Article) {
-        titleLabel.text = "記事タイトル"
-        urlLabel.text = article.url
+        if let urlString = article.ogp?.imageURLString, let url = URL(string: urlString) {
+            ogpImageView.kf.setImage(
+                with: url,
+                placeholder: UIImage(systemName: "photo"),
+                options: [.transition(.fade(0.2))],
+            )
+        } else {
+            ogpImageView.image = UIImage(systemName: "network")
+        }
 
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        formatter.timeStyle = .none
-        dateLabel.text = "保存日: \(formatter.string(from: article.createdAt))"
+        titleLabel.text = article.ogp?.title ?? article.url
+
+        if let articleURL = URL(string: article.url) {
+            urlHostLabel.text = articleURL.host ?? ""
+        } else {
+            urlHostLabel.text = ""  // 念のためのフォールバック
+        }
+
+        dateLabel.text = "保存: \(Self.dateFormatter.string(from: article.createdAt))"
     }
 }

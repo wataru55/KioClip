@@ -10,6 +10,7 @@
 		63872CA02EACB21A0055BB77 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 63872C9F2EACB21A0055BB77 /* RxCocoa */; };
 		63872CA22EACB21A0055BB77 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 63872CA12EACB21A0055BB77 /* RxSwift */; };
 		63872D072EAF08A40055BB77 /* OpenGraph in Frameworks */ = {isa = PBXBuildFile; productRef = 63872D062EAF08A40055BB77 /* OpenGraph */; };
+		63872D722EB4B9700055BB77 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 63872D712EB4B9700055BB77 /* Kingfisher */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,6 +72,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				63872D722EB4B9700055BB77 /* Kingfisher in Frameworks */,
 				63872CA22EACB21A0055BB77 /* RxSwift in Frameworks */,
 				63872CA02EACB21A0055BB77 /* RxCocoa in Frameworks */,
 				63872D072EAF08A40055BB77 /* OpenGraph in Frameworks */,
@@ -137,6 +139,7 @@
 				63872C9F2EACB21A0055BB77 /* RxCocoa */,
 				63872CA12EACB21A0055BB77 /* RxSwift */,
 				63872D062EAF08A40055BB77 /* OpenGraph */,
+				63872D712EB4B9700055BB77 /* Kingfisher */,
 			);
 			productName = KioClip;
 			productReference = 6321AF3B2E94E9A3007B8274 /* KioClip.app */;
@@ -223,6 +226,7 @@
 			packageReferences = (
 				63872C9E2EACB21A0055BB77 /* XCRemoteSwiftPackageReference "RxSwift" */,
 				63872D052EAF08A40055BB77 /* XCRemoteSwiftPackageReference "OpenGraph" */,
+				63872D702EB4B9700055BB77 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6321AF3C2E94E9A3007B8274 /* Products */;
@@ -613,6 +617,14 @@
 				minimumVersion = 1.6.0;
 			};
 		};
+		63872D702EB4B9700055BB77 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.6.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -630,6 +642,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 63872D052EAF08A40055BB77 /* XCRemoteSwiftPackageReference "OpenGraph" */;
 			productName = OpenGraph;
+		};
+		63872D712EB4B9700055BB77 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 63872D702EB4B9700055BB77 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
