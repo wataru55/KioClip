@@ -13,7 +13,7 @@ class ArticleTableViewCell: UITableViewCell {
     private let ogpImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.contentMode = .scaleAspectFit  // 画像の表示モード
+        imageView.contentMode = .scaleAspectFill  // 画像の表示モード
         imageView.clipsToBounds = true  // 角丸などのため
         imageView.layer.cornerRadius = 4
         return imageView
@@ -81,7 +81,7 @@ class ArticleTableViewCell: UITableViewCell {
 
         NSLayoutConstraint.activate([
             ogpImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
-            ogpImageView.widthAnchor.constraint(equalToConstant: 120),
+            ogpImageView.widthAnchor.constraint(equalToConstant: 140),
             ogpImageView.heightAnchor.constraint(equalToConstant: 80),
             ogpImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
             ogpImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4),
