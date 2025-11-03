@@ -41,12 +41,15 @@ class ArticleListViewController: UIViewController {
         setupDataSource()
         fetchArticles()
     }
+    
+    private func reloadTableView() {
+        self.dataSource.articles = self.articles
+        self.articleListView.tableView.reloadData()
+    }
 
     private func fetchArticles() {
         self.articles = dataService.fetchArticles()
-        self.dataSource.articles = self.articles
-        self.articleListView.tableView.reloadData()
-        
+        reloadTableView()
         triggerOGPSync()
     }
 
@@ -71,9 +74,12 @@ class ArticleListViewController: UIViewController {
                 await dataService.fetchAndCacheOGP(articleID: article.id)
             }
             
+            let latestArticles = dataService.fetchArticles()
+            
             await MainActor.run {
                 self.isSyncingOGPs = false
-                self.fetchArticles()
+                self.articles = latestArticles
+                reloadTableView()
             }
         }
     }
