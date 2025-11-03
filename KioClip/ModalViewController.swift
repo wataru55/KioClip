@@ -5,6 +5,8 @@
 //  Created by 高橋和 on 2025/10/11.
 //
 
+import RxCocoa
+import RxSwift
 import SwiftData
 import UIKit
 
@@ -32,9 +34,7 @@ enum ModalViewControllerType {
 }
 
 class ModalViewController: UIViewController {
-
     let type: ModalViewControllerType
-    weak var delegate: HalfModalViewControllerDelegate?
 
     private lazy var inputTextField: InputTextField = {
         let inputTextField = InputTextField(type: type.textFieldType)
@@ -46,13 +46,21 @@ class ModalViewController: UIViewController {
         return PersistenceController.shared.mainContext
     }()
 
+    private let itemDidAddSubject = PublishSubject<Void>()
+    let itemDidAdd: Observable<Void>
+
     init(type: ModalViewControllerType) {
         self.type = type
+        self.itemDidAdd = itemDidAddSubject.asObservable()
         super.init(nibName: nil, bundle: nil)
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    deinit {
+        itemDidAddSubject.onCompleted()
     }
 
     override func viewDidLoad() {
@@ -61,11 +69,6 @@ class ModalViewController: UIViewController {
         setupInputTextField()
 
         view.backgroundColor = .systemGray6
-    }
-
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        delegate?.didDismissModal()
     }
 
     private func setupNavigationBar() {
@@ -112,26 +115,27 @@ class ModalViewController: UIViewController {
     }
 
     @objc private func addButtonTapped() {
-        print("追加ボタンがタップされた！")
-        // ここに追加ボタンの処理を書く
+        switch type {
+        case .article:
+            guard let urlString = inputTextField.text, !urlString.isEmpty else {
+                return
+            }
 
-        guard let urlString = inputTextField.text, !urlString.isEmpty else {
-            return
+            let article = Article(url: urlString)
+            context.insert(article)
+        case .group:
+            print("グループ追加")
         }
 
-        let article = Article(url: urlString)
-        context.insert(article)
         do {
             try context.save()
             self.inputTextField.text = nil
-            print("Article saved successfully")
+
+            self.itemDidAddSubject.onNext(())
+            self.dismiss(animated: true)
         } catch {
             print("Error saving article: \(error)")
         }
     }
 
-}
-
-protocol HalfModalViewControllerDelegate: AnyObject {
-    func didDismissModal()
 }
