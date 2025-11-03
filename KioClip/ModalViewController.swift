@@ -5,10 +5,10 @@
 //  Created by 高橋和 on 2025/10/11.
 //
 
+import RxCocoa
+import RxSwift
 import SwiftData
 import UIKit
-import RxSwift
-import RxCocoa
 
 enum ModalViewControllerType {
     case group
@@ -35,17 +35,17 @@ enum ModalViewControllerType {
 
 class ModalViewController: UIViewController {
     let type: ModalViewControllerType
-    
+
     private lazy var inputTextField: InputTextField = {
         let inputTextField = InputTextField(type: type.textFieldType)
         inputTextField.translatesAutoresizingMaskIntoConstraints = false
         return inputTextField
     }()
-    
+
     private lazy var context: ModelContext = {
         return PersistenceController.shared.mainContext
     }()
-    
+
     private let itemDidAddSubject = PublishSubject<Void>()
     let itemDidAdd: Observable<Void>
 
@@ -57,6 +57,10 @@ class ModalViewController: UIViewController {
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    deinit {
+        itemDidAddSubject.onCompleted()
     }
 
     override func viewDidLoad() {
@@ -122,11 +126,11 @@ class ModalViewController: UIViewController {
         case .group:
             print("グループ追加")
         }
-        
+
         do {
             try context.save()
             self.inputTextField.text = nil
-            
+
             self.itemDidAddSubject.onNext(())
             self.dismiss(animated: true)
         } catch {
