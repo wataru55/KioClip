@@ -20,7 +20,7 @@ final class PersistenceController {
     
     private init() {
         // スキーマの定義
-        let schema = Schema([Article.self,])
+        let schema = Schema([Article.self, Group.self])
         // モデルコンテナの構成を設定
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
         
