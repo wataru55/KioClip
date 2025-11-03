@@ -46,12 +46,15 @@ class ModalViewController: UIViewController {
         return PersistenceController.shared.mainContext
     }()
 
-    private let itemDidAddSubject = PublishSubject<Void>()
-    let itemDidAdd: Observable<Void>
+    private let articleDidAddSubject = PublishSubject<Void>()
+    private let groupDidAddSubject = PublishSubject<Void>()
+    let articleDidAdd: Observable<Void>
+    let groupDidAdd: Observable<Void>
 
     init(type: ModalViewControllerType) {
         self.type = type
-        self.itemDidAdd = itemDidAddSubject.asObservable()
+        self.articleDidAdd = articleDidAddSubject.asObservable()
+        self.groupDidAdd = groupDidAddSubject.asObservable()
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -60,7 +63,8 @@ class ModalViewController: UIViewController {
     }
 
     deinit {
-        itemDidAddSubject.onCompleted()
+        articleDidAddSubject.onCompleted()
+        groupDidAddSubject.onCompleted()
     }
 
     override func viewDidLoad() {
@@ -123,19 +127,20 @@ class ModalViewController: UIViewController {
 
             let article = Article(url: urlString)
             context.insert(article)
+            
+            do {
+                try context.save()
+                self.articleDidAddSubject.onNext(())
+            } catch {
+                print("Error saving article: \(error)")
+            }
+            
         case .group:
             print("グループ追加")
         }
-
-        do {
-            try context.save()
-            self.inputTextField.text = nil
-
-            self.itemDidAddSubject.onNext(())
-            self.dismiss(animated: true)
-        } catch {
-            print("Error saving article: \(error)")
-        }
+        
+        self.inputTextField.text = nil
+        self.dismiss(animated: true)
     }
 
 }

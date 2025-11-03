@@ -101,7 +101,7 @@ class ArticleListViewController: UIViewController {
     @objc private func addButtonTapped() {
         let modalVC = ModalViewController(type: ModalViewControllerType.article)
         
-        modalVC.itemDidAdd
+        modalVC.articleDidAdd
             .subscribe(onNext: { [weak self] _ in
                 self?.fetchArticles()
             })
