@@ -1,5 +1,7 @@
 import SwiftData
 import UIKit
+import RxSwift
+import RxCocoa
 
 class ArticleListViewController: UIViewController {
     private let listTitle: String
@@ -9,6 +11,10 @@ class ArticleListViewController: UIViewController {
     private let articleListView = ArticleListView()
     private let dataService = ArticleDataService()
     private let dataSource = ArticleListDataSource()
+    
+    private let disposeBag = DisposeBag()
+    
+    private var isSyncingOGPs = false
 
     // 統合された初期化
     init(title: String, articles: [Article] = []) {
@@ -34,28 +40,42 @@ class ArticleListViewController: UIViewController {
         setupSearchController()
         setupDataSource()
         fetchArticles()
-
-        Task {
-            await syncAllOGPs()
-        }
     }
 
     private func fetchArticles() {
         self.articles = dataService.fetchArticles()
         self.dataSource.articles = self.articles
         self.articleListView.tableView.reloadData()
+        
+        triggerOGPSync()
     }
 
-    private func syncAllOGPs() async {
+    private func triggerOGPSync() {
+        guard !isSyncingOGPs else {
+            return
+        }
         // OGPがない記事だけを対象にする
         let articlesToFetch = self.articles.filter { $0.ogp == nil }
-
-        for article in articlesToFetch {
-            // 1件ずつ順番に取得・保存
-            await dataService.fetchAndCacheOGP(articleID: article.id)
+        
+        guard !articlesToFetch.isEmpty else {
+            print("ℹ️ OGP sync: 全てのOGPはキャッシュ済みです")
+            return
         }
+        print("ℹ️ OGP sync: \(articlesToFetch.count)件のOGP同期タスクを開始します...")
+        
+        isSyncingOGPs = true
 
-        self.fetchArticles()
+        Task {
+            for article in articlesToFetch {
+                try? Task.checkCancellation()
+                await dataService.fetchAndCacheOGP(articleID: article.id)
+            }
+            
+            await MainActor.run {
+                self.isSyncingOGPs = false
+                self.fetchArticles()
+            }
+        }
     }
 
     private func setupSearchController() {
@@ -74,6 +94,13 @@ class ArticleListViewController: UIViewController {
 
     @objc private func addButtonTapped() {
         let modalVC = ModalViewController(type: ModalViewControllerType.article)
+        
+        modalVC.itemDidAdd
+            .subscribe(onNext: { [weak self] _ in
+                self?.fetchArticles()
+            })
+            .disposed(by: disposeBag)
+        
         let navVC = UINavigationController(rootViewController: modalVC)
 
         if let sheet = navVC.sheetPresentationController {
