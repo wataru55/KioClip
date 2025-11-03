@@ -136,7 +136,19 @@ class ModalViewController: UIViewController {
             }
             
         case .group:
-            print("グループ追加")
+            guard let groupName = inputTextField.text, !groupName.isEmpty else {
+                return
+            }
+            
+            let group = Group(name: groupName)
+            context.insert(group)
+            
+            do {
+                try context.save()
+                self.groupDidAddSubject.onNext(())
+            } catch {
+                print("Error saving group: \(error)")
+            }
         }
         
         self.inputTextField.text = nil

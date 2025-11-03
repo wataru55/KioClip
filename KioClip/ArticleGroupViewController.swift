@@ -1,4 +1,7 @@
 import UIKit
+import SwiftData
+import RxSwift
+import RxCocoa
 
 class ArticleGroupViewController: UIViewController {
 
@@ -16,24 +19,35 @@ class ArticleGroupViewController: UIViewController {
             ArticleGroupCell.self, forCellWithReuseIdentifier: "ArticleGroupCell")
         return collectionView
     }()
+    
+    private lazy var context: ModelContext = {
+        return PersistenceController.shared.mainContext
+    }()
 
     private let addButton = AddButton()
-
-    // 仮のグループデータ
-    private let groups = [
-        "Swift",
-        "データベース",
-        "アルゴリズム",
-        "UI/UX",
-        "機械学習",
-        "お気に入り",
-    ]
+    private var groups: [Group] = []
+    private var disposeBag = DisposeBag()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         addButton.addTarget(self, action: #selector(addButtonTapped), for: .touchUpInside)
         setupUI()
         setupDataSource()
+        fetchGroups()
+    }
+    
+    private func fetchGroups() {
+        let descriptor = FetchDescriptor<Group>()
+        
+        do {
+            // Contextにリクエストを投げて、データを取得
+            let fetchedGroups = try context.fetch(descriptor)
+            print("✅ \(fetchedGroups.count)件のgroupを取得しました。")
+            self.groups = fetchedGroups
+            self.collectionView.reloadData()
+        } catch {
+            print("❌ 記事の取得に失敗しました: \(error)")
+        }
     }
 
     private func setupUI() {
@@ -67,6 +81,12 @@ class ArticleGroupViewController: UIViewController {
 
     @objc private func addButtonTapped() {
         let modalVC = ModalViewController(type: ModalViewControllerType.group)
+        modalVC.groupDidAdd
+            .subscribe(onNext: { [weak self] _ in
+                self?.fetchGroups()
+            })
+            .disposed(by: disposeBag)
+        
         let navVC = UINavigationController(rootViewController: modalVC)
 
         if let sheet = navVC.sheetPresentationController {
@@ -99,7 +119,7 @@ extension ArticleGroupViewController: UICollectionViewDataSource {
             collectionView.dequeueReusableCell(
                 withReuseIdentifier: "ArticleGroupCell", for: indexPath) as! ArticleGroupCell
 
-        cell.configure(with: groups[indexPath.item])
+        cell.configure(group: groups[indexPath.item])
         return cell
     }
 }
@@ -116,7 +136,7 @@ extension ArticleGroupViewController: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let selectedGroup = groups[indexPath.item]
-        let groupArticleListVC = ArticleListViewController(title: selectedGroup)
+        let groupArticleListVC = ArticleListViewController(title: selectedGroup.name)
         navigationController?.pushViewController(groupArticleListVC, animated: true)
     }
 }
