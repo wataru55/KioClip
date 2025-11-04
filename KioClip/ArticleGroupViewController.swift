@@ -86,7 +86,7 @@ extension ArticleGroupViewController: UICollectionViewDelegateFlowLayout {
         // 4. 正しい幅を計算
         // (全体の幅 - 左余白 - 右余白 - (アイテム間の隙間 * 隙間の数)) / 列数
         let totalHorizontalPadding = insets.left + insets.right + (spacing * (itemsPerRow - 1))
-        let width = (collectionView.frame.width - totalHorizontalPadding) / 2
+        let width = (collectionView.frame.width - totalHorizontalPadding) / itemsPerRow
         return CGSize(width: floor(width), height: 120)
     }
 
