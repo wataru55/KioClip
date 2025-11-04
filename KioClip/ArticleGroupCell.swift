@@ -56,8 +56,8 @@ class ArticleGroupCell: UICollectionViewCell {
         ])
     }
 
-    func configure(with groupName: String) {
-        titleLabel.text = groupName
-        countLabel.text = "記事数: \(Int.random(in: 1...20))"  // 仮の記事数
+    func configure(group: Group) {
+        titleLabel.text = group.name
+        countLabel.text = "記事数: \(group.articles.count)"
     }
 }

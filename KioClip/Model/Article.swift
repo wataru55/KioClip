@@ -13,15 +13,16 @@ final class Article {
     public private(set) var id: String
     public private(set) var createdAt: Date
     public private(set) var url: String
-    var groupName: String?
+    
+    @Relationship(deleteRule: .nullify)
+    var group: Group?
     
     @Relationship(deleteRule: .cascade)
     var ogp: OpenGraphData?
     
-    init(url: String, groupName: String? = nil) {
+    init(url: String) {
         self.id = UUID().uuidString
         self.createdAt = Date()
         self.url = url
-        self.groupName = groupName
     }
 }

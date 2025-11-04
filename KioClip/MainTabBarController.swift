@@ -55,7 +55,6 @@ class MainTabBarController: UITabBarController {
             for (articleIndex, _) in mockTitles.enumerated() {
                 let article = Article(
                     url: "https://example.com/\(group.lowercased())/article\(articleIndex + 1)",
-                    groupName: group,
                 )
                 allArticles.append(article)
             }
