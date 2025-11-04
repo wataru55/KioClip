@@ -15,11 +15,15 @@ class ArticleListViewController: UIViewController {
     private let disposeBag = DisposeBag()
     
     private var isSyncingOGPs = false
+    
+    private var selectedArticle: Article?
+    private var selectedGroup: Group?
 
     // 統合された初期化
-    init(title: String, articles: [Article] = []) {
+    init(title: String, articles: [Article] = [], selectedGroup: Group? = nil) {
         self.listTitle = title
         self.articles = articles
+        self.selectedGroup = selectedGroup
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -48,7 +52,7 @@ class ArticleListViewController: UIViewController {
     }
 
     private func fetchArticles() {
-        self.articles = dataService.fetchArticles()
+        self.articles = dataService.fetchArticles(group: selectedGroup)
         reloadTableView()
         triggerOGPSync()
     }
@@ -135,5 +139,81 @@ extension ArticleListViewController: UITableViewDelegate {
         if let url = URL(string: article.url) {
             UIApplication.shared.open(url)
         }
+    }
+    
+    //右カラスワイプした時の処理
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let alertAction = UIContextualAction(
+            style: .normal,
+            title: nil
+        ) { (_, _, completionHandler) in
+            print("通知を設定したよ")
+            completionHandler(true)
+        }
+        
+        alertAction.image = UIImage(systemName: "bell.fill")
+        alertAction.backgroundColor = .systemGreen
+        
+        let groupAction = UIContextualAction(
+            style: .normal,
+            title: nil) { _, _, completionHandler in
+                
+                self.selectedArticle = self.articles[indexPath.row]
+                let groupVC = ArticleGroupViewController(navTitle: "グループを選択")
+                groupVC.isForSelection = true
+                groupVC.delegete = self
+                
+                let navVC = UINavigationController(rootViewController: groupVC)
+                
+                self.present(navVC, animated: true)
+                completionHandler(true)
+            }
+        
+        groupAction.image = UIImage(systemName: "list.bullet")
+        
+        let configuration = UISwipeActionsConfiguration(actions: [alertAction, groupAction])
+        return configuration
+    }
+    
+    //左からスワイプした時の処理
+    func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let deleteAction = UIContextualAction(
+            style: .destructive,
+            title: nil,
+        ) { [weak self] (_, _, completionHandler) in
+            guard let self = self else {
+                completionHandler(false) // 失敗を通知
+                return
+            }
+            
+            let articleToDelete = self.articles[indexPath.row]
+            dataService.deleteArticle(article: articleToDelete)
+            
+            self.articles.remove(at: indexPath.row)
+            self.dataSource.articles = self.articles
+            self.articleListView.tableView.deleteRows(at: [indexPath], with: .automatic)
+            
+            print("記事を削除しました。")
+            
+            completionHandler(true)
+        }
+        
+        deleteAction.image = UIImage(systemName: "trash.fill")
+        
+        let configuration = UISwipeActionsConfiguration(actions: [deleteAction])
+        return configuration
+    }
+}
+
+extension ArticleListViewController: ArticleGroupViewControllerDelegate {
+    func didSelect(group: Group) {
+        print("「\(group.name)」が選択されて戻ってきたぞ")
+        
+        guard let selectedArticle = self.selectedArticle else { return }
+        selectedArticle.group = group
+        
+        dataService.updateArticle(article: selectedArticle)
+        
+        self.selectedArticle = nil
     }
 }

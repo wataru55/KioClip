@@ -3,14 +3,31 @@ import SwiftData
 import RxSwift
 import RxCocoa
 
+protocol ArticleGroupViewControllerDelegate: AnyObject {
+    func didSelect(group: Group)
+}
+
 class ArticleGroupViewController: UIViewController {
     private var groups: [Group] = []
+    let navTitle: String
     
     private let articleGroupView = ArticleGroupView()
     private let dataService = GroupDataService()
     private let dataSource = GroupDataSource()
     
     private var disposeBag = DisposeBag()
+    
+    weak var delegete: ArticleGroupViewControllerDelegate?
+    var isForSelection: Bool = false
+    
+    init(navTitle: String) {
+        self.navTitle = navTitle
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func loadView() {
         self.view = articleGroupView
@@ -23,7 +40,7 @@ class ArticleGroupViewController: UIViewController {
             action: #selector(addButtonTapped),
             for: .touchUpInside
         )
-        title = "グループ"
+        title = navTitle
         
         setupDataSource()
         fetchGroups()
@@ -92,8 +109,14 @@ extension ArticleGroupViewController: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let selectedGroup = groups[indexPath.item]
-        let groupArticleListVC = ArticleListViewController(title: selectedGroup.name)
-        navigationController?.pushViewController(groupArticleListVC, animated: true)
+        
+        if isForSelection {
+            delegete?.didSelect(group: selectedGroup)
+            self.dismiss(animated: true)
+        } else {
+            let groupArticleListVC = ArticleListViewController(title: selectedGroup.name, selectedGroup: selectedGroup)
+            navigationController?.pushViewController(groupArticleListVC, animated: true)
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
