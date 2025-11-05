@@ -46,6 +46,10 @@ class ArticleGroupViewController: UIViewController {
         title = navTitle
         
         setupDataSource()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         fetchGroups()
     }
     
