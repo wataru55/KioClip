@@ -78,7 +78,7 @@ class ArticleListViewController: UIViewController {
                 await dataService.fetchAndCacheOGP(articleID: article.id)
             }
             
-            let latestArticles = dataService.fetchArticles()
+            let latestArticles = dataService.fetchArticles(group: self.selectedGroup)
             
             await MainActor.run {
                 self.isSyncingOGPs = false
@@ -168,7 +168,7 @@ extension ArticleListViewController: UITableViewDelegate {
                     print("「\(group.name)」が選択されて戻ってきたぞ")
                     
                     guard let selectedArticle = self.selectedArticle else { return }
-                    selectedArticle.group = group
+                    selectedArticle.groups.append(group)
                     
                     dataService.updateArticle(article: selectedArticle)
                     self.fetchArticles()

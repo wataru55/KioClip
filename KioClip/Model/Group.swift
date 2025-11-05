@@ -11,7 +11,7 @@ import SwiftData
 @Model
 final class Group {
     var name: String
-    @Relationship(inverse: \Article.group)
+    @Relationship(inverse: \Article.groups)
     var articles: [Article]
     
     init(name: String, articles: [Article] = []) {

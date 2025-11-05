@@ -117,6 +117,8 @@ extension ArticleGroupViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let selectedGroup = groups[indexPath.item]
         
+        print("👉 タップされたグループ: (\(selectedGroup.name), ID: \(selectedGroup.persistentModelID.hashValue))")
+        
         if isForSelection {
             self.groupDidSelectSubject.onNext(selectedGroup)
             self.dismiss(animated: true)

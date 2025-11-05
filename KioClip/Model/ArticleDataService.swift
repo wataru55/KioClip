@@ -18,17 +18,15 @@ final class ArticleDataService {
     }
     
     func fetchArticles(group: Group? = nil) -> [Article] {
-        // FetchDescriptor(取得したいデータの注文書のようなもの)を作成する
-        // 絞り込み条件（Predicate）を "変数" として用意
-        var predicate: Predicate<Article>? = nil
-        
+        // グループが指定されている場合は、そのグループのarticlesを直接取得
         if let targetGroup = group {
-            let targetGroupID = targetGroup.persistentModelID
-            predicate = #Predicate<Article> { $0.group?.persistentModelID == targetGroupID }
+            let articles = Array(targetGroup.articles)
+            let sortedArticles = articles.sorted { $0.createdAt > $1.createdAt }
+            return sortedArticles
         }
         
+        // グループが指定されていない場合は，すべての記事を取得
         let descriptor = FetchDescriptor<Article>(
-            predicate: predicate,
             sortBy: [SortDescriptor<Article>(\.createdAt, order: .reverse)]
         )
             
