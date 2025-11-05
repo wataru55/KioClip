@@ -161,7 +161,22 @@ extension ArticleListViewController: UITableViewDelegate {
                 self.selectedArticle = self.articles[indexPath.row]
                 let groupVC = ArticleGroupViewController(navTitle: "グループを選択")
                 groupVC.isForSelection = true
-                groupVC.delegete = self
+                //groupVC.delegete = self
+                
+                groupVC.groupDidSelect.subscribe { [weak self] group in
+                    guard let self = self else { return }
+                    print("「\(group.name)」が選択されて戻ってきたぞ")
+                    
+                    guard let selectedArticle = self.selectedArticle else { return }
+                    selectedArticle.group = group
+                    
+                    dataService.updateArticle(article: selectedArticle)
+                    self.fetchArticles()
+                    
+                    self.selectedArticle = nil
+                    
+                }
+                .disposed(by: self.disposeBag)
                 
                 let navVC = UINavigationController(rootViewController: groupVC)
                 
@@ -202,18 +217,5 @@ extension ArticleListViewController: UITableViewDelegate {
         
         let configuration = UISwipeActionsConfiguration(actions: [deleteAction])
         return configuration
-    }
-}
-
-extension ArticleListViewController: ArticleGroupViewControllerDelegate {
-    func didSelect(group: Group) {
-        print("「\(group.name)」が選択されて戻ってきたぞ")
-        
-        guard let selectedArticle = self.selectedArticle else { return }
-        selectedArticle.group = group
-        
-        dataService.updateArticle(article: selectedArticle)
-        
-        self.selectedArticle = nil
     }
 }

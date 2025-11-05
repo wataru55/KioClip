@@ -3,10 +3,6 @@ import SwiftData
 import RxSwift
 import RxCocoa
 
-protocol ArticleGroupViewControllerDelegate: AnyObject {
-    func didSelect(group: Group)
-}
-
 class ArticleGroupViewController: UIViewController {
     private var groups: [Group] = []
     let navTitle: String
@@ -17,16 +13,23 @@ class ArticleGroupViewController: UIViewController {
     
     private var disposeBag = DisposeBag()
     
-    weak var delegete: ArticleGroupViewControllerDelegate?
+    private let groupDidSelectSubject = PublishSubject<Group>()
+    var groupDidSelect: Observable<Group>
+    
     var isForSelection: Bool = false
     
     init(navTitle: String) {
         self.navTitle = navTitle
+        self.groupDidSelect = groupDidSelectSubject.asObservable()
         super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        groupDidSelectSubject.onCompleted()
     }
     
     override func loadView() {
@@ -111,7 +114,7 @@ extension ArticleGroupViewController: UICollectionViewDelegateFlowLayout {
         let selectedGroup = groups[indexPath.item]
         
         if isForSelection {
-            delegete?.didSelect(group: selectedGroup)
+            self.groupDidSelectSubject.onNext(selectedGroup)
             self.dismiss(animated: true)
         } else {
             let groupArticleListVC = ArticleListViewController(title: selectedGroup.name, selectedGroup: selectedGroup)
