@@ -5,12 +5,32 @@ import RxCocoa
 
 class ArticleGroupViewController: UIViewController {
     private var groups: [Group] = []
+    let navTitle: String
     
     private let articleGroupView = ArticleGroupView()
     private let dataService = GroupDataService()
     private let dataSource = GroupDataSource()
     
     private var disposeBag = DisposeBag()
+    
+    private let groupDidSelectSubject = PublishSubject<Group>()
+    var groupDidSelect: Observable<Group>
+    
+    var isForSelection: Bool = false
+    
+    init(navTitle: String) {
+        self.navTitle = navTitle
+        self.groupDidSelect = groupDidSelectSubject.asObservable()
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        groupDidSelectSubject.onCompleted()
+    }
     
     override func loadView() {
         self.view = articleGroupView
@@ -23,9 +43,13 @@ class ArticleGroupViewController: UIViewController {
             action: #selector(addButtonTapped),
             for: .touchUpInside
         )
-        title = "グループ"
+        title = navTitle
         
         setupDataSource()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         fetchGroups()
     }
     
@@ -92,8 +116,16 @@ extension ArticleGroupViewController: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let selectedGroup = groups[indexPath.item]
-        let groupArticleListVC = ArticleListViewController(title: selectedGroup.name)
-        navigationController?.pushViewController(groupArticleListVC, animated: true)
+        
+        print("👉 タップされたグループ: (\(selectedGroup.name), ID: \(selectedGroup.persistentModelID.hashValue))")
+        
+        if isForSelection {
+            self.groupDidSelectSubject.onNext(selectedGroup)
+            self.dismiss(animated: true)
+        } else {
+            let groupArticleListVC = ArticleListViewController(title: selectedGroup.name, selectedGroup: selectedGroup)
+            navigationController?.pushViewController(groupArticleListVC, animated: true)
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {

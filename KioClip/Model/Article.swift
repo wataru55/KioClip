@@ -15,7 +15,7 @@ final class Article {
     public private(set) var url: String
     
     @Relationship(deleteRule: .nullify)
-    var group: Group?
+    var groups: [Group] = []
     
     @Relationship(deleteRule: .cascade)
     var ogp: OpenGraphData?

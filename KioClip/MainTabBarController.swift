@@ -16,7 +16,7 @@ class MainTabBarController: UITabBarController {
 
     private func setupViewControllers() {
         // グループタブ
-        let groupVC = ArticleGroupViewController()
+        let groupVC = ArticleGroupViewController(navTitle: "グループ")
         // グループタブをNavigationControllerでラップ
         let groupNavVC = UINavigationController(rootViewController: groupVC)
         groupNavVC.tabBarItem = UITabBarItem(

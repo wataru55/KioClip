@@ -17,15 +17,20 @@ final class ArticleDataService {
         self.context = PersistenceController.shared.mainContext
     }
     
-    func fetchArticles() -> [Article] {
-        // FetchDescriptor(取得したいデータの注文書のようなもの)を作成
-        // createdAtの降順（新しい順）でソート
+    func fetchArticles(group: Group? = nil) -> [Article] {
+        // グループが指定されている場合は、そのグループのarticlesを直接取得
+        if let targetGroup = group {
+            let articles = Array(targetGroup.articles)
+            let sortedArticles = articles.sorted { $0.createdAt > $1.createdAt }
+            return sortedArticles
+        }
+        
+        // グループが指定されていない場合は，すべての記事を取得
         let descriptor = FetchDescriptor<Article>(
-            sortBy: [SortDescriptor(\.createdAt, order: .reverse)]
+            sortBy: [SortDescriptor<Article>(\.createdAt, order: .reverse)]
         )
-
+            
         do {
-            // Contextにリクエストを投げて、データを取得
             let fetchedArticles = try context.fetch(descriptor)
             print("✅ \(fetchedArticles.count)件の記事を取得しました。")
             return fetchedArticles
@@ -69,6 +74,24 @@ final class ArticleDataService {
             
         } catch {
             print("❌ OGPの保存に失敗: \(error)")
+        }
+    }
+    
+    func saveContext() {
+        do {
+            try context.save()
+        } catch {
+            print("❌ 記事の更新に失敗: \(error)")
+        }
+    }
+    
+    func deleteArticle(article: Article) {
+        context.delete(article)
+        
+        do {
+            try context.save()
+        } catch {
+            print("❌ 記事の削除に失敗: \(error)")
         }
     }
 }
