@@ -35,6 +35,7 @@ enum ModalViewControllerType {
 
 class ModalViewController: UIViewController {
     let type: ModalViewControllerType
+    let selectedGroup: Group?
 
     private lazy var inputTextField: InputTextField = {
         let inputTextField = InputTextField(type: type.textFieldType)
@@ -51,10 +52,11 @@ class ModalViewController: UIViewController {
     let articleDidAdd: Observable<Void>
     let groupDidAdd: Observable<Void>
 
-    init(type: ModalViewControllerType) {
+    init(type: ModalViewControllerType, group: Group? = nil) {
         self.type = type
         self.articleDidAdd = articleDidAddSubject.asObservable()
         self.groupDidAdd = groupDidAddSubject.asObservable()
+        self.selectedGroup = group
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -126,6 +128,9 @@ class ModalViewController: UIViewController {
             }
 
             let article = Article(url: urlString)
+            if let selectedGroup = self.selectedGroup {
+                article.groups.append(selectedGroup)
+            }
             context.insert(article)
             
             do {

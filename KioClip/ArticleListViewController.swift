@@ -43,6 +43,10 @@ class ArticleListViewController: UIViewController {
 
         setupSearchController()
         setupDataSource()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         fetchArticles()
     }
 
@@ -103,7 +107,7 @@ class ArticleListViewController: UIViewController {
     }
 
     @objc private func addButtonTapped() {
-        let modalVC = ModalViewController(type: ModalViewControllerType.article)
+        let modalVC = ModalViewController(type: ModalViewControllerType.article, group: selectedGroup)
 
         modalVC.articleDidAdd
             .subscribe(onNext: { [weak self] _ in
