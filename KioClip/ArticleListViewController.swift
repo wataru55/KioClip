@@ -201,8 +201,24 @@ extension ArticleListViewController: UITableViewDelegate {
                 return
             }
             
-            let articleToDelete = self.articles[indexPath.row]
-            dataService.deleteArticle(article: articleToDelete)
+            let articleToModify = self.articles[indexPath.row]
+            if let targetGroup = self.selectedGroup {
+                // グループ画面での削除
+                guard let index = articleToModify.groups.firstIndex(where: { group in
+                    group.persistentModelID == targetGroup.persistentModelID
+                }) else {
+                    completionHandler(false)
+                    return
+                }
+                
+                articleToModify.groups.remove(at: index)
+                self.dataService.updateArticle(article: articleToModify)
+                
+            } else {
+                // 一覧画面での削除
+                dataService.deleteArticle(article: articleToModify)
+            }
+            
             
             self.articles.remove(at: indexPath.row)
             self.dataSource.articles = self.articles
