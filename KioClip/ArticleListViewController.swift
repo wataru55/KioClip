@@ -161,14 +161,19 @@ extension ArticleListViewController: UITableViewDelegate {
                 self.selectedArticle = self.articles[indexPath.row]
                 let groupVC = ArticleGroupViewController(navTitle: "グループを選択")
                 groupVC.isForSelection = true
-                //groupVC.delegete = self
                 
                 groupVC.groupDidSelect.subscribe { [weak self] group in
                     guard let self = self else { return }
                     print("「\(group.name)」が選択されて戻ってきたぞ")
                     
                     guard let selectedArticle = self.selectedArticle else { return }
-                    selectedArticle.groups.append(group)
+                    
+                    if !selectedArticle.groups.contains(where: { $0.persistentModelID == group.persistentModelID }) {
+                        selectedArticle.groups.append(group)
+                    } else {
+                        print("⚠️ このグループは既に追加されています: \(group.name)")
+                        return
+                    }
                     
                     dataService.updateArticle(article: selectedArticle)
                     self.fetchArticles()
