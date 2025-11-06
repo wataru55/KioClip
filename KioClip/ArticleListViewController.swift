@@ -180,7 +180,7 @@ extension ArticleListViewController: UITableViewDelegate {
                     return
                 }
 
-                dataService.updateArticle(article: selectedArticle)
+                dataService.saveContext()
                 self.fetchArticles()
 
                 self.selectedArticle = nil
@@ -226,7 +226,7 @@ extension ArticleListViewController: UITableViewDelegate {
                 }
 
                 articleToModify.groups.remove(at: index)
-                self.dataService.updateArticle(article: articleToModify)
+                self.dataService.saveContext()
 
             } else {
                 // 一覧画面での削除

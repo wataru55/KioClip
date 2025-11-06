@@ -77,7 +77,7 @@ final class ArticleDataService {
         }
     }
     
-    func updateArticle(article: Article) {
+    func saveContext() {
         do {
             try context.save()
         } catch {
