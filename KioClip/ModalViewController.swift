@@ -46,7 +46,7 @@ class ModalViewController: UIViewController {
     private lazy var context: ModelContext = {
         return PersistenceController.shared.mainContext
     }()
-    
+
     private lazy var customTextButton: UIBarButtonItem = {
         let button = UIBarButtonItem(
             title: "追加",
@@ -55,9 +55,9 @@ class ModalViewController: UIViewController {
             action: #selector(addButtonTapped)
         )
         button.tintColor = .systemGreen
-        
+
         button.isEnabled = false
-        
+
         return button
     }()
 
@@ -65,7 +65,7 @@ class ModalViewController: UIViewController {
     private let groupDidAddSubject = PublishSubject<Void>()
     let articleDidAdd: Observable<Void>
     let groupDidAdd: Observable<Void>
-    
+
     private var disposeBag = DisposeBag()
 
     init(type: ModalViewControllerType, group: Group? = nil) {
@@ -88,7 +88,7 @@ class ModalViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemGray6
-        
+
         setupNavigationBar()
         setupInputTextField()
         setupBinding()
@@ -117,17 +117,25 @@ class ModalViewController: UIViewController {
             inputTextField.heightAnchor.constraint(equalToConstant: 60),
         ])
     }
-    
+
     private func setupBinding() {
         inputTextField.rx.text
             .orEmpty
-            .map { text in
-                return !text.isEmpty
+            .map { [weak self] text in
+                guard let self = self else { return false }
+                switch self.type {
+                case .article:
+                    // 記事の場合は、URL形式も検証
+                    return URLValidator.isValidURL(text)
+                case .group:
+                    // グループの場合は、空でないかだけチェック
+                    return !text.isEmpty
+                }
             }
             .bind(to: customTextButton.rx.isEnabled)
             .disposed(by: disposeBag)
     }
-    
+
     private func showInvalidURLAlert() {
         let alert = UIAlertController(
             title: "無効なURLです",
@@ -135,7 +143,7 @@ class ModalViewController: UIViewController {
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-        
+
         // (重要) モーダル (self) がアラートを "present" する
         self.present(alert, animated: true, completion: nil)
     }
@@ -149,17 +157,13 @@ class ModalViewController: UIViewController {
         switch type {
         case .article:
             let urlString = inputTextField.text
-            
-            guard URLValidator.isValidURL(urlString) else {
-                if let text = urlString, text.isEmpty {
-                    return
-                }
-                
+
+            guard URLValidator.isValidURL(urlString), let urlString = urlString else {
                 showInvalidURLAlert()
                 return
             }
-            
-            let article = Article(url: urlString!)
+
+            let article = Article(url: urlString)
             context.insert(article)
 
             if let selectedGroup = self.selectedGroup {
