@@ -16,6 +16,7 @@ class ArticleTableViewCell: UITableViewCell {
         imageView.contentMode = .scaleAspectFill  // 画像の表示モード
         imageView.clipsToBounds = true  // 角丸などのため
         imageView.layer.cornerRadius = 4
+        imageView.tintColor = .secondaryLabel
         return imageView
     }()
 
