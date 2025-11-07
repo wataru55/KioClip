@@ -15,10 +15,10 @@ struct URLValidator {
         
         guard let url = URL(string: urlString),
               let scheme = url.scheme,
-              ["http", "https"].contains(scheme.lowercased()) else {
+              ["http", "https"].contains(scheme.lowercased()),
+              let host = url.host, !host.isEmpty else {
             return false
         }
-        
         return true
     }
 }
