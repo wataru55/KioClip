@@ -46,11 +46,27 @@ class ModalViewController: UIViewController {
     private lazy var context: ModelContext = {
         return PersistenceController.shared.mainContext
     }()
+    
+    private lazy var customTextButton: UIBarButtonItem = {
+        let button = UIBarButtonItem(
+            title: "追加",
+            style: .done,
+            target: self,
+            action: #selector(addButtonTapped)
+        )
+        button.tintColor = .systemGreen
+        
+        button.isEnabled = false
+        
+        return button
+    }()
 
     private let articleDidAddSubject = PublishSubject<Void>()
     private let groupDidAddSubject = PublishSubject<Void>()
     let articleDidAdd: Observable<Void>
     let groupDidAdd: Observable<Void>
+    
+    private var disposeBag = DisposeBag()
 
     init(type: ModalViewControllerType, group: Group? = nil) {
         self.type = type
@@ -71,34 +87,21 @@ class ModalViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .systemGray6
+        
         setupNavigationBar()
         setupInputTextField()
-
-        view.backgroundColor = .systemGray6
+        setupBinding()
     }
 
     private func setupNavigationBar() {
-        // 1. 中央にタイトルを設定
         self.title = type.navBarTitle
 
-        // 2. 左側に閉じるボタンを設置
         let closeButton = UIBarButtonItem(
             barButtonSystemItem: .close, target: self, action: #selector(closeButtonTapped))
         self.navigationItem.leftBarButtonItem = closeButton
 
-        // 3. 右側に追加ボタンを設置
-        // "追加" という文字列のボタンを作成
-        let customTextButton = UIBarButtonItem(
-            title: "追加",  // ← ここで好きな文字列を指定
-            style: .done,  // .doneにすると太字になる
-            target: self,
-            action: #selector(addButtonTapped)
-        )
-
-        // 必要であれば文字の色も変えられる
-        customTextButton.tintColor = .systemGreen
-
-        self.navigationItem.rightBarButtonItem = customTextButton
+        self.navigationItem.rightBarButtonItem = self.customTextButton
     }
 
     private func setupInputTextField() {
@@ -114,6 +117,28 @@ class ModalViewController: UIViewController {
             inputTextField.heightAnchor.constraint(equalToConstant: 60),
         ])
     }
+    
+    private func setupBinding() {
+        inputTextField.rx.text
+            .orEmpty
+            .map { text in
+                return !text.isEmpty
+            }
+            .bind(to: customTextButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+    }
+    
+    private func showInvalidURLAlert() {
+        let alert = UIAlertController(
+            title: "無効なURLです",
+            message: "http:// または https:// から始まる\n正しいURLを入力してください。",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        
+        // (重要) モーダル (self) がアラートを "present" する
+        self.present(alert, animated: true, completion: nil)
+    }
 
     @objc private func closeButtonTapped() {
         print("閉じるボタンがタップされた")
@@ -123,11 +148,18 @@ class ModalViewController: UIViewController {
     @objc private func addButtonTapped() {
         switch type {
         case .article:
-            guard let urlString = inputTextField.text, !urlString.isEmpty else {
+            let urlString = inputTextField.text
+            
+            guard URLValidator.isValidURL(urlString) else {
+                if let text = urlString, text.isEmpty {
+                    return
+                }
+                
+                showInvalidURLAlert()
                 return
             }
-
-            let article = Article(url: urlString)
+            
+            let article = Article(url: urlString!)
             context.insert(article)
 
             if let selectedGroup = self.selectedGroup {
