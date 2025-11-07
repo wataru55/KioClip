@@ -145,7 +145,7 @@ extension ArticleListViewController: UITableViewDelegate {
         }
     }
 
-    //右カラスワイプした時の処理
+    //右からスワイプした時の処理
     func tableView(
         _ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
     ) -> UISwipeActionsConfiguration? {
@@ -169,23 +169,26 @@ extension ArticleListViewController: UITableViewDelegate {
             let groupVC = ArticleGroupViewController(navTitle: "グループを選択")
             groupVC.isForSelection = true
 
-            groupVC.groupDidSelect.subscribe(onNext: { [weak self] group in
+            groupVC.groupsDidSelect.subscribe(onNext: { [weak self] selectedGroups in
                 guard let self = self else { return }
-                print("「\(group.name)」が選択されて戻ってきたぞ")
-
                 guard let selectedArticle = self.selectedArticle else { return }
-
-                if !selectedArticle.groups.contains(where: {
-                    $0.persistentModelID == group.persistentModelID
-                }) {
-                    selectedArticle.groups.append(group)
-                } else {
-                    print("⚠️ このグループは既に追加されています: \(group.name)")
-                    return
+                
+                var didAppend = false
+                for group in selectedGroups {
+                    if !selectedArticle.groups.contains(where: {
+                        $0.persistentModelID == group.persistentModelID
+                    }) {
+                        selectedArticle.groups.append(group)
+                        didAppend = true
+                    } else {
+                        print("⚠️ このグループは既に追加されています: \(group.name)")
+                    }
                 }
 
-                dataService.saveContext()
-                self.fetchArticles()
+                if didAppend {
+                    dataService.saveContext()
+                    self.fetchArticles()
+                }
 
                 self.selectedArticle = nil
 
