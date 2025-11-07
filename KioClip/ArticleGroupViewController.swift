@@ -13,14 +13,14 @@ class ArticleGroupViewController: UIViewController {
     
     private var disposeBag = DisposeBag()
     
-    private let groupDidSelectSubject = PublishSubject<Group>()
-    var groupDidSelect: Observable<Group>
+    private let groupsDidSelectSubject = PublishSubject<[Group]>()
+    var groupsDidSelect: Observable<[Group]>
     
     var isForSelection: Bool = false
     
     init(navTitle: String) {
         self.navTitle = navTitle
-        self.groupDidSelect = groupDidSelectSubject.asObservable()
+        self.groupsDidSelect = groupsDidSelectSubject.asObservable()
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -29,7 +29,7 @@ class ArticleGroupViewController: UIViewController {
     }
     
     deinit {
-        groupDidSelectSubject.onCompleted()
+        groupsDidSelectSubject.onCompleted()
     }
     
     override func loadView() {
@@ -46,6 +46,10 @@ class ArticleGroupViewController: UIViewController {
         title = navTitle
         
         setupDataSource()
+        
+        if isForSelection {
+            setupForSelection()
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -63,12 +67,34 @@ class ArticleGroupViewController: UIViewController {
         articleGroupView.collectionView.dataSource = self.dataSource
         articleGroupView.collectionView.delegate = self
     }
+    
+    private func setupForSelection() {
+        // CollectionViewで "複数選択" を許可
+        articleGroupView.collectionView.allowsMultipleSelection = true
+        
+        let doneButton = UIBarButtonItem(
+            title: "完了",
+            style: .done,
+            target: self,
+            action: #selector(doneButtonTapped)
+        )
+        self.navigationItem.rightBarButtonItem = doneButton
+        
+        let cancelButton = UIBarButtonItem(
+            title: "キャンセル",
+            style: .plain,
+            target: self,
+            action: #selector(cancelButtonTapped)
+        )
+        self.navigationItem.leftBarButtonItem = cancelButton
+    }
 
     @objc private func addButtonTapped() {
         let modalVC = ModalViewController(type: ModalViewControllerType.group)
         modalVC.groupDidAdd
             .subscribe(onNext: { [weak self] _ in
-                self?.fetchGroups()
+                guard let self = self else { return }
+                self.fetchGroups()
             })
             .disposed(by: disposeBag)
         
@@ -86,6 +112,28 @@ class ArticleGroupViewController: UIViewController {
             sheet.prefersScrollingExpandsWhenScrolledToEdge = false
         }
         present(navVC, animated: true, completion: nil)
+    }
+    
+    @objc private func doneButtonTapped() {
+        // (a) 現在選択されている全ての "IndexPath" を取得
+        guard let selectedIndexPaths = articleGroupView.collectionView.indexPathsForSelectedItems,
+              !selectedIndexPaths.isEmpty
+        else {
+            self.dismiss(animated: true)
+            return
+        }
+        
+        // (b) "IndexPath" の配列を "Group" の配列に変換
+        let selectedGroups = selectedIndexPaths.map { indexPath in
+            self.groups[indexPath.item]
+        }
+        
+        self.groupsDidSelectSubject.onNext(selectedGroups)
+        self.dismiss(animated: true)
+    }
+    
+    @objc private func cancelButtonTapped() {
+        self.dismiss(animated: true)
     }
 }
 
@@ -119,10 +167,7 @@ extension ArticleGroupViewController: UICollectionViewDelegateFlowLayout {
         
         print("👉 タップされたグループ: (\(selectedGroup.name), ID: \(selectedGroup.persistentModelID.hashValue))")
         
-        if isForSelection {
-            self.groupDidSelectSubject.onNext(selectedGroup)
-            self.dismiss(animated: true)
-        } else {
+        if !isForSelection {
             let groupArticleListVC = ArticleListViewController(title: selectedGroup.name, selectedGroup: selectedGroup)
             navigationController?.pushViewController(groupArticleListVC, animated: true)
         }

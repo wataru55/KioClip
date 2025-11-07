@@ -87,11 +87,6 @@ final class ArticleDataService {
     
     func deleteArticle(article: Article) {
         context.delete(article)
-        
-        do {
-            try context.save()
-        } catch {
-            print("❌ 記事の削除に失敗: \(error)")
-        }
+        self.saveContext()
     }
 }
