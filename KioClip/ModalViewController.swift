@@ -128,26 +128,27 @@ class ModalViewController: UIViewController {
             }
 
             let article = Article(url: urlString)
+            context.insert(article)
+
             if let selectedGroup = self.selectedGroup {
                 article.groups.append(selectedGroup)
             }
-            context.insert(article)
-            
+
             do {
                 try context.save()
                 self.articleDidAddSubject.onNext(())
             } catch {
                 print("Error saving article: \(error)")
             }
-            
+
         case .group:
             guard let groupName = inputTextField.text, !groupName.isEmpty else {
                 return
             }
-            
+
             let group = Group(name: groupName)
             context.insert(group)
-            
+
             do {
                 try context.save()
                 self.groupDidAddSubject.onNext(())
@@ -155,7 +156,7 @@ class ModalViewController: UIViewController {
                 print("Error saving group: \(error)")
             }
         }
-        
+
         self.inputTextField.text = nil
         self.dismiss(animated: true)
     }

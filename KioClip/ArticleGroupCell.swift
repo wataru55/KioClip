@@ -19,16 +19,14 @@ class ArticleGroupCell: UICollectionViewCell {
         label.textAlignment = .center
         return label
     }()
-    
+
     override var isSelected: Bool {
         didSet {
-            // 選択されたら: 青枠 + チェックマーク
-            // 解除されたら: 元の背景色
             if isSelected {
                 self.contentView.backgroundColor = .systemGreen.withAlphaComponent(0.1)
                 self.contentView.layer.borderColor = UIColor.systemGreen.cgColor
                 self.contentView.layer.borderWidth = 2
-                
+
             } else {
                 self.contentView.backgroundColor = .secondarySystemBackground
                 self.contentView.layer.borderWidth = 0
@@ -48,32 +46,36 @@ class ArticleGroupCell: UICollectionViewCell {
     private func setupUI() {
         // --- 1. 影（シャドウ）の設定 ---
         // 影は「セル本体(self.layer)」に設定
-        backgroundColor = .clear // ⬅︎ セル自体は透明に
+        backgroundColor = .clear  // ⬅︎ セル自体は透明に
         layer.shadowColor = UIColor.black.cgColor
         layer.shadowOffset = CGSize(width: 0, height: 2)
         layer.shadowRadius = 4
         layer.shadowOpacity = 0.1
-        layer.masksToBounds = false // ⬅︎ 影を外にはみ出させる
-        
+        layer.masksToBounds = false  // ⬅︎ 影を外にはみ出させる
+
         // --- 2. 見た目の設定 ---
         // 見た目は "contentView.layer" に設定
         contentView.backgroundColor = .secondarySystemBackground
         contentView.layer.cornerRadius = 12
-        contentView.clipsToBounds = true // ⬅︎ これで contentView が角丸になる
-        
+        contentView.clipsToBounds = true  // ⬅︎ これで contentView が角丸になる
+
         contentView.addSubview(titleLabel)
         contentView.addSubview(countLabel)
 
         NSLayoutConstraint.activate([
             titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: -10),
-            titleLabel.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor, constant: 8),
-            titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor, constant: -8),
+            titleLabel.leadingAnchor.constraint(
+                greaterThanOrEqualTo: contentView.leadingAnchor, constant: 8),
+            titleLabel.trailingAnchor.constraint(
+                lessThanOrEqualTo: contentView.trailingAnchor, constant: -8),
 
             countLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             countLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
-            countLabel.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor, constant: 8),
-            countLabel.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor, constant: -8),
+            countLabel.leadingAnchor.constraint(
+                greaterThanOrEqualTo: contentView.leadingAnchor, constant: 8),
+            countLabel.trailingAnchor.constraint(
+                lessThanOrEqualTo: contentView.trailingAnchor, constant: -8),
         ])
     }
 
