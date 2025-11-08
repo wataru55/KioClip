@@ -11,9 +11,13 @@ import SwiftData
 @MainActor
 final class GroupDataService {
     private let context: ModelContext
+    
+    init(context: ModelContext) {
+        self.context = context
+    }
         
-    init() {
-        self.context = PersistenceController.shared.mainContext
+    convenience init() {
+        self.init(context: PersistenceController.shared.container.mainContext)
     }
     
     func fetchGroups() -> [Group] {
