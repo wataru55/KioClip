@@ -20,9 +20,9 @@ final class Article {
     @Relationship(deleteRule: .cascade)
     var ogp: OpenGraphData?
     
-    init(url: String) {
+    init(url: String, createdAt: Date = Date()) {
         self.id = UUID().uuidString
-        self.createdAt = Date()
+        self.createdAt = createdAt
         self.url = url
     }
 }

@@ -69,7 +69,6 @@ fastlane/test_output
 
 .DS_Store
 *.swp
-UserInterfaceState.xcuserstate
 # GoogleService-Info.plist
 Package.resolved
 Private.json
@@ -77,3 +76,7 @@ Private.json
 # VS Code / Cursor settings
 .vscode/
 buildServer.json
+
+# Xcode
+UserInterfaceState.xcuserstate
+xcuserdata/
