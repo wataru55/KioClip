@@ -255,3 +255,4 @@ extension ArticleListViewController: UITableViewDelegate {
         return configuration
     }
 }
+
