@@ -54,12 +54,7 @@ class MainTabBarController: UITabBarController {
 
             for (articleIndex, title) in mockTitles.enumerated() {
                 let article = Article(
-                    id: UUID().uuidString,
-                    title: title,
                     url: "https://example.com/\(group.lowercased())/article\(articleIndex + 1)",
-                    groupName: group,
-                    savedDate: Date().addingTimeInterval(-Double(articleIndex * 86400)),
-                    nextReviewDate: Date().addingTimeInterval(Double(articleIndex * 86400 * 3))
                 )
                 allArticles.append(article)
             }

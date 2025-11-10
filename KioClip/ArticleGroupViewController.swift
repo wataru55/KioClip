@@ -20,14 +20,7 @@ class ArticleGroupViewController: UIViewController {
     private let addButton = AddButton()
 
     // 仮のグループデータ
-    private let groups = [
-        "Swift",
-        "データベース",
-        "アルゴリズム",
-        "UI/UX",
-        "機械学習",
-        "お気に入り",
-    ]
+    var groups: [Group] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -99,7 +92,7 @@ extension ArticleGroupViewController: UICollectionViewDataSource {
             collectionView.dequeueReusableCell(
                 withReuseIdentifier: "ArticleGroupCell", for: indexPath) as! ArticleGroupCell
 
-        cell.configure(with: groups[indexPath.item])
+        cell.configure(with: groups[indexPath.item].name)
         return cell
     }
 }
@@ -116,7 +109,7 @@ extension ArticleGroupViewController: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let selectedGroup = groups[indexPath.item]
-        let groupArticleListVC = ArticleListViewController(title: selectedGroup)
+        let groupArticleListVC = ArticleListViewController(title: selectedGroup.name)
         navigationController?.pushViewController(groupArticleListVC, animated: true)
     }
 }

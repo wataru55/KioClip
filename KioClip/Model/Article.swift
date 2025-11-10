@@ -6,12 +6,20 @@
 //
 
 import UIKit
+import SwiftData
 
-struct Article {
-    let id: String
-    let title: String
-    let url: String
-    let groupName: String
-    let savedDate: Date
-    let nextReviewDate: Date
+@Model
+final class Article {
+    public private(set) var id: String
+    public private(set) var createdAt: Date
+    public private(set) var url: String
+    
+    @Relationship(deleteRule: .nullify)
+    var groups: [Group] = []
+    
+    init(url: String, createdAt: Date = Date()) {
+        self.id = UUID().uuidString
+        self.createdAt = createdAt
+        self.url = url
+    }
 }

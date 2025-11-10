@@ -58,12 +58,12 @@ class ArticleTableViewCell: UITableViewCell {
     }
 
     func configure(with article: Article) {
-        titleLabel.text = article.title
+        titleLabel.text = article.url
         urlLabel.text = article.url
 
         let formatter = DateFormatter()
         formatter.dateStyle = .short
         formatter.timeStyle = .none
-        dateLabel.text = "保存日: \(formatter.string(from: article.savedDate))"
+        dateLabel.text = "保存日: \(formatter.string(from: article.createdAt))"
     }
 }
