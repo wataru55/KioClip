@@ -7,29 +7,6 @@
 
 import UIKit
 
-enum ModalViewControllerType {
-    case group
-    case article
-
-    var navBarTitle: String {
-        switch self {
-        case .group:
-            return "新規グループ"
-        case .article:
-            return "新規URL"
-        }
-    }
-
-    var textFieldType: TextFieldType {
-        switch self {
-        case .group:
-            return .group
-        case .article:
-            return .article
-        }
-    }
-}
-
 class ModalViewController: UIViewController {
 
     let type: ModalViewControllerType
@@ -100,7 +77,7 @@ class ModalViewController: UIViewController {
 
     @objc private func closeButtonTapped() {
         print("閉じるボタンがタップされた")
-        self.dismiss(animated: true)
+        mainStore.dispatch(action: .dismissModal)
     }
 
     @objc private func addButtonTapped() {

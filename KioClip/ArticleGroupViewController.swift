@@ -59,21 +59,7 @@ class ArticleGroupViewController: UIViewController {
     }
 
     @objc private func addButtonTapped() {
-        let modalVC = ModalViewController(type: ModalViewControllerType.group)
-        let navVC = UINavigationController(rootViewController: modalVC)
-
-        if let sheet = navVC.sheetPresentationController {
-            let smallDetent = UISheetPresentationController.Detent.custom(
-                identifier: .init("small")
-            ) { context in
-                // ここで好きな高さを返す
-                return 200
-            }
-            sheet.detents = [smallDetent]
-            sheet.largestUndimmedDetentIdentifier = nil
-            sheet.prefersScrollingExpandsWhenScrolledToEdge = false
-        }
-        present(navVC, animated: true, completion: nil)
+        mainStore.dispatch(action: .presentModal(type: .group))
     }
 }
 
